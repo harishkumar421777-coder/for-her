@@ -1,219 +1,208 @@
-/* ========================= */
-/* DOM ELEMENTS */
-/* ========================= */
+// ===================== PAGES =====================
 
-const noBtn = document.getElementById("noBtn");
-const yesBtn = document.getElementById("yesBtn");
-const mainPage = document.getElementById("mainPage");
-const letterPage = document.getElementById("letterPage");
-const typedText = document.getElementById("typedText");
+const pages = document.querySelectorAll(".page");
 
-const angryPopup = document.getElementById("angryPopup");
-const flowerScreen = document.getElementById("flowerScreen");
-const flowerBloom = document.getElementById("flowerBloom");
-const bgMusic = document.getElementById("bgMusic");
-
-/* ========================= */
-/* FORCE SAFE INITIAL STATE */
-/* ========================= */
-
-console.log("JS Loaded");
-
-if (mainPage) mainPage.style.display = "block";
-if (flowerScreen) flowerScreen.classList.add("hidden");
-if (angryPopup) angryPopup.classList.add("hidden");
-
-/* ========================= */
-/* STORY QUESTIONS */
-/* ========================= */
-
-const questions = [
-  "Do you really know what you’re choosing luv? ❤️",
-  "Are you confident about how much you love Bubu? ",
-  "Does Bubu love you more than you love him? 💕",
-  "Be honest… you don’t love Bubu more, do you?"
-];
-
-let currentStep = 0;
-
-/* ========================= */
-/* NO BUTTON DODGE (ONLY FIRST QUESTION) */
-/* ========================= */
-
-if (noBtn) {
-  noBtn.addEventListener("mouseenter", () => {
-
-    if (currentStep !== 0) return;
-
-    noBtn.style.position = "fixed";
-
-    const buttonWidth = noBtn.offsetWidth;
-    const buttonHeight = noBtn.offsetHeight;
-
-    const maxX = window.innerWidth - buttonWidth - 20;
-    const maxY = window.innerHeight - buttonHeight - 20;
-
-    const randomX = Math.random() * maxX;
-    const randomY = Math.random() * maxY;
-
-    noBtn.style.left = randomX + "px";
-    noBtn.style.top = randomY + "px";
-  });
+function showPage(index){
+  pages.forEach(page=>page.classList.remove("active"));
+  pages[index].classList.add("active");
 }
 
-/* ========================= */
-/* YES BUTTON FLOW */
-/* ========================= */
+// ===================== ELEMENTS =====================
 
-if (yesBtn) {
-  yesBtn.addEventListener("click", () => {
+const startBtn=document.getElementById("startBtn");
+const heart=document.getElementById("heart");
+const score=document.getElementById("score");
+const gift=document.getElementById("gift");
+const blowBtn=document.getElementById("blowBtn");
+const flame=document.getElementById("flame");
+const restart=document.getElementById("restart");
+const letter=document.getElementById("letter");
 
-    currentStep++;
+// ===================== START =====================
 
-    // More questions remaining
-    if (currentStep < questions.length) {
+startBtn.addEventListener("click",()=>{
+    showPage(1);
+});
 
-      const titleElement = document.querySelector(".title");
-      if (titleElement) {
-        titleElement.innerText = questions[currentStep];
-      }
+// ===================== HEART GAME =====================
 
-      // Reset No button back to normal position
-      if (noBtn) {
-        noBtn.style.position = "relative";
-        noBtn.style.left = "0px";
-        noBtn.style.top = "0px";
-      }
+let caught=0;
 
-    } else {
+heart.addEventListener("click",()=>{
 
-      // Hide question page
-      if (mainPage) mainPage.style.display = "none";
+    caught++;
 
-      // Show flower screen
-      if (flowerScreen) flowerScreen.classList.remove("hidden");
+    score.innerHTML=`${caught} / 5`;
+
+    if(caught<5){
+
+        moveHeart();
+
+    }else{
+
+        setTimeout(()=>{
+
+            showPage(2);
+
+        },500);
+
     }
-  });
+
+});
+
+function moveHeart(){
+
+    const box=document.querySelector(".heart-card");
+
+    const maxX=box.clientWidth-100;
+    const maxY=box.clientHeight-180;
+
+    const x=Math.random()*maxX;
+    const y=Math.random()*maxY+100;
+
+    heart.style.left=x+"px";
+    heart.style.top=y+"px";
+
+    heart.style.transform="scale(1.25)";
+
+    setTimeout(()=>{
+
+        heart.style.transform="scale(1)";
+
+    },150);
+
 }
 
-/* ========================= */
-/* NO BUTTON CLICK (AFTER FIRST QUESTION) */
-/* ========================= */
+// ===================== GIFT =====================
 
-if (noBtn) {
-  noBtn.addEventListener("click", () => {
+gift.addEventListener("click",()=>{
 
-    if (currentStep === 0) return;
+    gift.style.transform="scale(1.2) rotate(15deg)";
 
-    if (!angryPopup) return;
+    createConfetti();
 
-    angryPopup.classList.remove("hidden");
-    angryPopup.classList.add("show");
+    setTimeout(()=>{
 
-    setTimeout(() => {
-      angryPopup.classList.remove("show");
-      setTimeout(() => {
-        angryPopup.classList.add("hidden");
-      }, 300);
-    }, 1200);
-  });
+        showPage(3);
+
+    },800);
+
+});
+
+// ===================== CAKE =====================
+
+blowBtn.addEventListener("click",()=>{
+
+    flame.style.display="none";
+
+    createConfetti();
+
+    setTimeout(()=>{
+
+        showPage(4);
+
+        typeWriter();
+
+    },1000);
+
+});
+
+// ===================== LETTER =====================
+
+const text=`Happy Birthday My Love ❤️
+
+Every moment with you is special.
+
+Thank you for always being there.
+
+I promise to love you forever.
+
+❤️`;
+
+function typeWriter(){
+
+    letter.innerHTML="";
+
+    let i=0;
+
+    const timer=setInterval(()=>{
+
+        letter.innerHTML+=text.charAt(i);
+
+        i++;
+
+        if(i>=text.length){
+
+            clearInterval(timer);
+
+        }
+
+    },40);
+
 }
 
-/* ========================= */
-/* FLOWER CLICK */
-/* ========================= */
+// ===================== FLOATING HEARTS =====================
 
-if (flowerBloom) {
-  flowerBloom.addEventListener("click", () => {
+setInterval(()=>{
 
-    if (flowerScreen) flowerScreen.classList.add("hidden");
-    if (letterPage) letterPage.classList.remove("hidden");
+    const area=document.getElementById("bg-hearts");
 
-    startTyping();
-    startConfetti();
+    const h=document.createElement("div");
 
-    if (bgMusic) {
-      bgMusic.volume = 0.5;
-      bgMusic.play().catch(() => {});
+    h.className="floating-heart";
+
+    h.innerHTML="❤️";
+
+    h.style.left=Math.random()*100+"vw";
+
+    h.style.fontSize=(Math.random()*15+15)+"px";
+
+    h.style.animationDuration=(Math.random()*4+5)+"s";
+
+    area.appendChild(h);
+
+    setTimeout(()=>{
+
+        h.remove();
+
+    },9000);
+
+},500);
+
+// ===================== CONFETTI =====================
+
+function createConfetti(){
+
+    const area=document.getElementById("confetti");
+
+    for(let i=0;i<120;i++){
+
+        const c=document.createElement("div");
+
+        c.className="confetti";
+
+        c.style.left=Math.random()*100+"vw";
+
+        c.style.background=`hsl(${Math.random()*360},90%,60%)`;
+
+        c.style.animationDuration=(Math.random()*2+2)+"s";
+
+        area.appendChild(c);
+
+        setTimeout(()=>{
+
+            c.remove();
+
+        },4000);
+
     }
-  });
+
 }
 
-/* ========================= */
-/* TYPING EFFECT */
-/* ========================= */
+// ===================== REPLAY =====================
 
-const message = `From the moment you walked into my life so unexpectedly, Mumu, everything changed in the most beautiful way. I never imagined I would fall so deeply in love with someone I hadn’t even met and yet, here we are luv
+restart.addEventListener("click",()=>{
 
-You are my happiness, my peace, and the safest place my heart has ever known mate!! 
+    location.reload();
 
-Honestly, you’re exceptionally beautiful
-
-You are my forever person, Shreya.
-
-Nearly two years have passed since April 25, 2024, and not a single day has made my feelings weaker and I am endlessly grateful that you came into my life.
-
-And no matter what happens, my heart will always choose you, MARRY ME SHREYA 💍❤️`;
-
-let i = 0;
-
-function startTyping() {
-  if (!typedText) return;
-
-  typedText.innerHTML = "";
-  i = 0;
-
-  const interval = setInterval(() => {
-    typedText.innerHTML += message.charAt(i);
-    i++;
-    if (i >= message.length) clearInterval(interval);
-  }, 25);
-}
-
-/* ========================= */
-/* CONFETTI */
-/* ========================= */
-
-const canvas = document.getElementById("confetti");
-let ctx = null;
-let particles = [];
-
-if (canvas) {
-  ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-
-function startConfetti() {
-
-  if (!ctx) return;
-
-  particles = [];
-
-  for (let i = 0; i < 120; i++) {
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      size: Math.random() * 6 + 2,
-      speed: Math.random() * 3 + 2
-    });
-  }
-
-  animate();
-}
-
-function animate() {
-
-  if (!ctx) return;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#ff4d6d";
-
-  particles.forEach(p => {
-    ctx.fillRect(p.x, p.y, p.size, p.size);
-    p.y += p.speed;
-    if (p.y > canvas.height) p.y = 0;
-  });
-
-  requestAnimationFrame(animate);
-}
+});
